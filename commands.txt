@@ -1,0 +1,4 @@
+# in cmd  to start jupiter server:  
+d:
+cd D:\Radi\fmiKG\IR
+python -m notebook
