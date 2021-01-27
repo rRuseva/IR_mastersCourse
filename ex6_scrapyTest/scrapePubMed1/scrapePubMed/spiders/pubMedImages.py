@@ -47,7 +47,7 @@ class PubMedImagesSpider(scrapy.Spider):
         print("*************************************************************")
         articleUrl = response.request.url
         print("Parsing URL: " + articleUrl)
-        docTitle = response.xpath('//h1[contains(@class, "content-title")]').get()
+        docTitle = response.xpath('//h1[contains(@class, "content-title")]/text()').get()
         # print("docTitle: " + docTitle)
 
         docId = articleUrl.split("/")
@@ -64,13 +64,13 @@ class PubMedImagesSpider(scrapy.Spider):
             imgName = imgUrl.split("/")
             imgName = docId + "-" + str(i + 1) + "_" + imgName[len(imgName) - 1]
 
-            text = figure.xpath('.//div[contains(@class, "caption")]').get()
+            text = figure.xpath('.//div[contains(@class, "caption")]/p/text()').get()
             # print(text)
 
             yield {
+                'docId': docId,
                 'articleUrl': articleUrl,
                 'docTitle': docTitle,
-                'docId': docId,
                 'image_url': imgUrl,
                 'image_path': imgName,
                 'caption': text

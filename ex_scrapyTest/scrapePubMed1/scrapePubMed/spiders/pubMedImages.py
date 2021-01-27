@@ -19,7 +19,7 @@ class PubMedImagesSpider(scrapy.Spider):
     journalsCount = 0
 
     def parse(self, response):
-        article = response.xpath('//div[contains(@class, "article")]//h1[contains(@class, "content-title")]')
+        article = response.xpath('//div[contains(@class, "article")]//h1[contains(@class, "content-title")]/text()')
         figures = response.xpath('//div[contains(@class, "fig ")]')
 
         # if(article or figures):
@@ -69,7 +69,7 @@ class PubMedImagesSpider(scrapy.Spider):
         print("*************************************************************")
         articleUrl = response.request.url
         print("Parsing URL: " + articleUrl)
-        docTitle = response.xpath('//h1[contains(@class, "content-title")]').get()
+        docTitle = response.xpath('//h1[contains(@class, "content-title")]/text()').get()
         # print("docTitle: " + docTitle)
 
         docId = articleUrl.split("/")
@@ -86,15 +86,15 @@ class PubMedImagesSpider(scrapy.Spider):
             imgName = imgUrl.split("/")
             imgName = docId + "-" + str(i + 1) + "_" + imgName[len(imgName) - 1]
 
-            text = figure.xpath('.//div[contains(@class, "caption")]').get()
+            text = figure.xpath('.//div[contains(@class, "caption")]/p/text()').get()
             # print(text)
 
             yield {
+                'docId': docId,
+                'image_path': imgName,
+                'image_url': imgUrl,
                 'articleUrl': articleUrl,
                 'docTitle': docTitle,
-                'docId': docId,
-                'image_url': imgUrl,
-                'image_path': imgName,
                 'caption': text
             }
 
