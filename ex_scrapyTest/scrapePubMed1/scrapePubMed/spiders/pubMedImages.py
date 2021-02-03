@@ -6,7 +6,6 @@ import os
 class PubMedImagesSpider(scrapy.Spider):
     name = 'pubMedImages'
     start_urls = [
-        #'https://www.ncbi.nlm.nih.gov/pmc/journals/'
         #'https://ncbi.nlm.nih.gov/pmc/issues/359201/'
         #'https://www.ncbi.nlm.nih.gov/pmc/journals/1876/'
         'https://www.ncbi.nlm.nih.gov/pmc/journals/'
@@ -34,7 +33,7 @@ class PubMedImagesSpider(scrapy.Spider):
             # print("*************************************************************")
             # for articleUrl in self.articleUrls:
             for articleUrl in articleList:
-                print(articleUrl)
+                # print(articleUrl)
                 # yield response.follow(self.root_url + articleUrl, callback=self.parse)
                 yield response.follow(articleUrl, callback=self.parseArticle)
 
@@ -51,7 +50,7 @@ class PubMedImagesSpider(scrapy.Spider):
             for i, jUrl in enumerate(journalList):
                 if(i < 2):
                     self.journalsCount += 1
-                    print(jUrl)
+                    # print(jUrl)
                     yield response.follow(self.root_url + jUrl, callback=self.parse)
 
     def parseArticleList(self, response):
@@ -61,47 +60,49 @@ class PubMedImagesSpider(scrapy.Spider):
             self.articleUrls.append(url)
 
         articlesCount = len(self.articleUrls)
-        print("articlesCount: ", articlesCount)
+        #print("articlesCount: ", articlesCount)
         # yield articleUrls
         self.articleUrlsCount += articlesCount
 
     def parseArticle(self, response):
-        print("*************************************************************")
+        # print("*************************************************************")
         articleUrl = response.request.url
-        print("Parsing URL: " + articleUrl)
-        docTitle = response.xpath('//h1[contains(@class, "content-title")]/text()').get()
-        # print("docTitle: " + docTitle)
+        #print("Parsing URL: " + articleUrl)
+        articleTitle = response.xpath('normalize-space(//h1[contains(@class, "content-title")])').extract_first()
+        # print("articleTitle: " + articleTitle)
 
-        docId = articleUrl.split("/")
-        docId = docId[len(docId) - 2]
-        #print("docId: " + docId)
+        articleId = articleUrl.split("/")
+        articleId = articleId[len(articleId) - 2]
+        #print("articleId: " + articleId)
         figures = response.xpath('//div[contains(@class, "fig ")]')
 
         n = len(figures)
-        print("{n} figures are found".format(n=n))
+        #print("{n} figures are found".format(n=n))
         i = 0
         for figure in figures:
             imgUrl = self.root_url + figure.xpath('.//img/@src').get()
             # print(imgUrl)
             imgName = imgUrl.split("/")
-            imgName = docId + "-" + str(i + 1) + "_" + imgName[len(imgName) - 1]
+            imgName = articleId + "-" + str(i + 1) + "_" + imgName[len(imgName) - 1]
 
-            text = figure.xpath('.//div[contains(@class, "caption")]/p/text()').get()
+            text = figure.xpath('normalize-space(.//div[contains(@class, "caption")]/p)').extract_first()
             # print(text)
 
             yield {
-                'docId': docId,
+                'articleId': articleId,
                 'image_path': imgName,
                 'image_url': imgUrl,
                 'articleUrl': articleUrl,
-                'docTitle': docTitle,
+                'articleTitle': articleTitle,
                 'caption': text
             }
 
             i += 1
         self.imagesCount += i
-        # print("*************************************************************")
+        print("*************************************************************")
+        print("Total journals count:" + str(self.journalsCount))
         print("Total issues count:" + str(self.issuesCount))
         print("Total articles count:" + str(self.articleUrlsCount))
         print("Total figures count:" + str(self.imagesCount))
+
         print("*************************************************************")

@@ -7,7 +7,9 @@ class PubMedImagesSpider(scrapy.Spider):
     name = 'pubMedImages'
     start_urls = [
         #'https://www.ncbi.nlm.nih.gov/pmc/journals/'
-        'https://ncbi.nlm.nih.gov/pmc/issues/359201/'
+        #'https://ncbi.nlm.nih.gov/pmc/issues/359201/',
+        'https://www.ncbi.nlm.nih.gov/pmc/issues/266237/'
+
     ]
     root_url = 'https://www.ncbi.nlm.nih.gov'
     articleUrls = []
@@ -64,7 +66,7 @@ class PubMedImagesSpider(scrapy.Spider):
             imgName = imgUrl.split("/")
             imgName = docId + "-" + str(i + 1) + "_" + imgName[len(imgName) - 1]
 
-            text = figure.xpath('.//div[contains(@class, "caption")]/p/text()').get()
+            text = figure.xpath('normalize-space(.//div[contains(@class, "caption")]/p)').extract_first()
             # print(text)
 
             yield {
