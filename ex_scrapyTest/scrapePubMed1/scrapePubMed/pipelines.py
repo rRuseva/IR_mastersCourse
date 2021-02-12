@@ -21,10 +21,11 @@ class MedImagesPipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
         # for image_url in item['image_url']:
         #     yield Request(image_url)
-        img_url = item['image_url']
-        meta = {'filename': item['image_path']}
+        img_urls = item['image_url']
+        filenames = item['image_path']
 
-        yield Request(url=img_url, meta=meta)
+        for img_url, name in zip(img_urls, filenames):
+            yield Request(url=img_url, meta={'filename': name})
 
     def item_completed(self, results, item, info):
         image_paths = [x['path'] for ok, x in results if ok]

@@ -65,6 +65,7 @@ class PubMedImagesSpider(scrapy.Spider):
         self.articleUrlsCount += articlesCount
 
     def parseArticle(self, response):
+        result = {}
         # print("*************************************************************")
         articleUrl = response.request.url
         #print("Parsing URL: " + articleUrl)
@@ -74,6 +75,14 @@ class PubMedImagesSpider(scrapy.Spider):
         articleId = articleUrl.split("/")
         articleId = articleId[len(articleId) - 2]
         #print("articleId: " + articleId)
+
+        result['articleId'] = articleId
+        result['articleUrl'] = articleUrl
+        result['articleTitle'] = articleTitle
+        result['image_path'] = []
+        result['image_url'] = []
+        result['caption'] = []
+
         figures = response.xpath('//div[contains(@class, "fig ")]')
 
         n = len(figures)
@@ -87,18 +96,22 @@ class PubMedImagesSpider(scrapy.Spider):
 
             text = figure.xpath('normalize-space(.//div[contains(@class, "caption")]/p)').extract_first()
             # print(text)
-
-            yield {
-                'articleId': articleId,
-                'image_path': imgName,
-                'image_url': imgUrl,
-                'articleUrl': articleUrl,
-                'articleTitle': articleTitle,
-                'caption': text
-            }
+            result['image_path'].append(imgName)
+            result['image_url'].append(imgUrl)
+            result['caption'].append(text)
+            yield result
+            # yield {
+            #     'articleId': articleId,
+            #     'image_path': imgName,
+            #     'image_url': imgUrl,
+            #     'articleUrl': articleUrl,
+            #     'articleTitle': articleTitle,
+            #     'caption': text
+            # }
 
             i += 1
         self.imagesCount += i
+
         print("*************************************************************")
         print("Total journals count:" + str(self.journalsCount))
         print("Total issues count:" + str(self.issuesCount))

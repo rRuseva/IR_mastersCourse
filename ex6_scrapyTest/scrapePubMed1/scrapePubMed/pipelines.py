@@ -21,10 +21,17 @@ class MedImagesPipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
         # for image_url in item['image_url']:
         #     yield Request(image_url)
-        img_url = item['image_url']
-        meta = {'filename': item['image_path']}
 
-        yield Request(url=img_url, meta=meta)
+        img_urls = item['image_url']
+        filenames = item['image_paths']
+        print("__________________________________________________________________________")
+        print(img_urls)
+        print(filenames)
+
+        for img_url, name in zip(img_urls, filenames):
+            print(img_url)
+            print(name)
+            yield Request(url=img_url, meta={'filename': name})
 
     def item_completed(self, results, item, info):
         image_paths = [x['path'] for ok, x in results if ok]
@@ -51,7 +58,7 @@ class JsonWriterPipeline(object):
         self.pubMedImages_json.close()
 
     def process_item(self, item, spider):
-        line = json.dumps(ItemAdapter(item).asdict(), ensure_ascii=False) + "\n"
+        line = json.dumps(dict(item), ensure_ascii=False) + "\n"
 
         self.pubMedImages_json.write(line)
 
