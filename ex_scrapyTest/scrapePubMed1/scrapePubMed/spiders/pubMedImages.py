@@ -87,30 +87,32 @@ class PubMedImagesSpider(scrapy.Spider):
 
         n = len(figures)
         #print("{n} figures are found".format(n=n))
-        i = 0
-        for figure in figures:
-            imgUrl = self.root_url + figure.xpath('.//img/@src').get()
-            # print(imgUrl)
-            imgName = imgUrl.split("/")
-            imgName = articleId + "-" + str(i + 1) + "_" + imgName[len(imgName) - 1]
+        if n > 0:
+            i = 0
+            for figure in figures:
+                imgUrl = self.root_url + figure.xpath('.//img/@src').get()
+                # print(imgUrl)
+                imgName = imgUrl.split("/")
+                imgName = articleId + "-" + str(i + 1) + "_" + imgName[len(imgName) - 1]
 
-            text = figure.xpath('normalize-space(.//div[contains(@class, "caption")]/p)').extract_first()
-            # print(text)
-            result['image_path'].append(imgName)
-            result['image_url'].append(imgUrl)
-            result['caption'].append(text)
+                text = figure.xpath('normalize-space(.//div[contains(@class, "caption")]/p)').extract_first()
+                # print(text)
+                result['image_path'].append(imgName)
+                result['image_url'].append(imgUrl)
+                result['caption'].append(text)
+
+                # yield {
+                #     'articleId': articleId,
+                #     'image_path': imgName,
+                #     'image_url': imgUrl,
+                #     'articleUrl': articleUrl,
+                #     'articleTitle': articleTitle,
+                #     'caption': text
+                # }
+
+                i += 1
+            self.imagesCount += i
             yield result
-            # yield {
-            #     'articleId': articleId,
-            #     'image_path': imgName,
-            #     'image_url': imgUrl,
-            #     'articleUrl': articleUrl,
-            #     'articleTitle': articleTitle,
-            #     'caption': text
-            # }
-
-            i += 1
-        self.imagesCount += i
 
         print("*************************************************************")
         print("Total journals count:" + str(self.journalsCount))
