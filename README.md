@@ -1,2 +1,2 @@
 # IR_mastersCourse
-Repository containing exercises for the course Information Retrieval .
+Repository containing exercises and final project for the course Information Retrieval.
