@@ -1,0 +1,7 @@
+
+pip install Scrapy
+pip install --upgrade Pillow
+pip install pandas
+pip install regex
+pip install nltk
+pip install -U scikit-learn
